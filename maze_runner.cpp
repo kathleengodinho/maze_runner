@@ -131,7 +131,6 @@ bool walk(pos_t start, int rows, int cols) {
 int main(int argc, char* argv[]) {
     maze_infos infos = load_maze("/workspaces/maze_runner/data/maze5.txt");
     print_maze();
-    if (!walk(infos.initial_pos, infos.rows, infos.cols)) {
-        printf("Não foi encontrado um caminho viável.\n");
-    }
+    walk(infos.initial_pos, infos.rows, infos.cols);
+      
 }
