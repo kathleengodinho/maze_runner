@@ -129,8 +129,7 @@ bool walk(pos_t start, int rows, int cols) {
 }
 
 int main(int argc, char* argv[]) {
-    maze_infos infos = load_maze("/workspaces/maze_runner/data/maze5.txt");
+    maze_infos infos = load_maze("/workspaces/maze_runner/data/maze.txt");
     print_maze();
     walk(infos.initial_pos, infos.rows, infos.cols);
-      
 }
