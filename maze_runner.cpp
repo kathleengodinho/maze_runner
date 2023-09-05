@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stack>
 #include <cstdlib>
+#include <vector>
 
 // Matriz de char representando o labirinto
 char **maze;
@@ -107,21 +108,39 @@ bool walk(pos_t start, int rows, int cols) {
             printf("\n");
         }
 
-        if (current.i > 0 && maze[current.i-1][current.j] == 'x') {
-            maze[current.i-1][current.j] = '.';
-            valid_positions.push({current.i-1, current.j});
+        std::vector<std::thread> threads; // Vetor para armazenar as threads adicionais
+
+        if (current.i > 0 && maze[current.i - 1][current.j] == 'x') {
+            maze[current.i - 1][current.j] = '.';
+            valid_positions.push({ current.i - 1, current.j });
+
+            // Crie uma thread adicional para explorar o caminho alternativo
+            threads.emplace_back(walk, pos_t{ current.i - 1, current.j }, rows, cols);
         }
-        if (current.i < rows-1 && maze[current.i+1][current.j] == 'x') {
-            maze[current.i+1][current.j] = '.';
-            valid_positions.push({current.i+1, current.j});
+        if (current.i < rows - 1 && maze[current.i + 1][current.j] == 'x') {
+            maze[current.i + 1][current.j] = '.';
+            valid_positions.push({ current.i + 1, current.j });
+
+            // Crie uma thread adicional para explorar o caminho alternativo
+            threads.emplace_back(walk, pos_t{ current.i + 1, current.j }, rows, cols);
         }
-        if (current.j > 0 && maze[current.i][current.j-1] == 'x') {
-            maze[current.i][current.j-1] = '.';
-            valid_positions.push({current.i, current.j-1});
+        if (current.j > 0 && maze[current.i][current.j - 1] == 'x') {
+            maze[current.i][current.j - 1] = '.';
+            valid_positions.push({ current.i, current.j - 1 });
+
+            // Crie uma thread adicional para explorar o caminho alternativo
+            threads.emplace_back(walk, pos_t{ current.i, current.j - 1 }, rows, cols);
         }
-        if (current.j < cols-1 && maze[current.i][current.j+1] == 'x') {
-            maze[current.i][current.j+1] = '.';
-            valid_positions.push({current.i, current.j+1});
+        if (current.j < cols - 1 && maze[current.i][current.j + 1] == 'x') {
+            maze[current.i][current.j + 1] = '.';
+            valid_positions.push({ current.i, current.j + 1 });
+
+            // Crie uma thread adicional para explorar o caminho alternativo
+            threads.emplace_back(walk, pos_t{ current.i, current.j + 1 }, rows, cols);
+        }
+        // Aguarde todas as threads adicionais terminarem
+        for (std::thread& thread : threads) {
+            thread.join();
         }
     }
 
@@ -129,7 +148,8 @@ bool walk(pos_t start, int rows, int cols) {
 }
 
 int main(int argc, char* argv[]) {
-    maze_infos infos = load_maze("/workspaces/maze_runner/data/maze.txt");
+    maze_infos infos = load_maze("/workspaces/maze_runner/data/maze5.txt");
     print_maze();
     walk(infos.initial_pos, infos.rows, infos.cols);
+    
 }
